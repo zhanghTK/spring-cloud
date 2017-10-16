@@ -18,7 +18,7 @@
 
 07_rest-template：RestTemplate 使用
 
-08_ribbon-consumer-hystrix：服务消费者，发现服务，消费服务，错误熔断
+08_ribbon-consumer-hystrix：服务消费者，发现服务，消费服务，错误熔断，Hystrix Dashboard
 
 ### Modules 使用：
 01_springboot: Spring Boot
@@ -153,3 +153,23 @@ ZoneAvoidanceRule：使用组合过滤：先过滤区域，再过滤非故障、
 #### 总结
 1. 拦截 RestTemplate 请求，交给 ILoadBalancer 负载均衡
 2. ILoadBalancer 的实现以定时任务形式维护可用服务列表，提供服务获取、过滤，统计调用调用信息、服务状态
+
+## Hystrix
+
+### 使用
+1. 启用 @EnableCircuitBreaker
+2. 使用 @HystrixCommand
+
+### 相关 UNL
+
+### 核心实现
+1. @EnableCircuitBreaker 注解指定 EnableCircuitBreakerImportSelector 加载 Spring.factories 中的 EnableCircuitBreaker=HystrixCircuitBreakerConfiguration
+2. HystrixCommandAspect 创建 @HystrixCommand 注解切面
+3. 根据方法信息创建 MetaHolder 实例，
+  1. 同步方式调用 HystrixCommand.execute
+  2. 异步方式调用 HystrixCommand.queue
+  3. OBSERVABLE 方式调用 HystrixCommand.observe 或 HystrixCommand.toObservable
+
+### 总结
+1. 创建 @HystrixCommand 方法切面
+2. 将普通方法转换为 HystrixCommand
