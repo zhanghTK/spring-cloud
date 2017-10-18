@@ -1,13 +1,14 @@
 package tk.zhangh.springcloud.web;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.serviceregistry.Registration;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -21,11 +22,10 @@ public class HelloController {
 
     @Autowired
     private DiscoveryClient client;
-
     @Autowired
     private Registration registration;
 
-    @RequestMapping(value = "hello", method = RequestMethod.GET)
+    @RequestMapping(value = "/hello", method = RequestMethod.GET)
     public String index() throws InterruptedException {
         String serviceId = registration.getServiceId();
         for (ServiceInstance instance : client.getInstances(serviceId)) {
@@ -35,5 +35,29 @@ public class HelloController {
             log.info("/hello, host:" + instance.getHost() + ", service_id:" + instance.getServiceId());
         }
         return "hello world";
+    }
+
+    @GetMapping(value = "/hello1")
+    public String hello(@RequestParam String name) {
+        return "Hello " + name;
+    }
+
+    @GetMapping(value = "/hello2")
+    public User hello(@RequestHeader String name, @RequestHeader Integer age) {
+        return new User().setName(name).setAge(age);
+    }
+
+    @PostMapping(value = "/hello3")
+    public String hello(@RequestBody User user) {
+        return "Hello " + user.getName() + ", " + user.getAge();
+    }
+
+    @Data
+    @NoArgsConstructor
+    @Accessors(chain = true)
+    public static class User {
+        private String id;
+        private String name;
+        private Integer age;
     }
 }
